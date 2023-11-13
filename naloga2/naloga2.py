@@ -147,14 +147,14 @@ print(ffs_mses)
 
 print(np.argmin(ffs_mses))
 
-split_index = np.argmin(ffs_mses)
+split_index = np.argmin(ffs_mses) #take index before, so it is even better, per example index 20 (by hand) or threshold derivative of graph
 
 
 #feature selection according to optimal feature set
-data_ffs = data_ffs[:, :split_index+1]
+data_ffs = data_ffs[:, :20+1] #split_index changed to 20 by hand
 
 test_data_ffs = None
-for i in ffs_feature_selections[:split_index+1]:
+for i in ffs_feature_selections[:20+1]:
     if test_data_ffs is None:
         test_data_ffs = test_data[:, i].reshape(-1, 1)
     else:
