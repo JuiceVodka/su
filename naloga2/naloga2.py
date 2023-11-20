@@ -136,7 +136,7 @@ np.save("ffs_data.npy", data_ffs)
 np.save("ffs_mses.npy", ffs_mses)
 np.save("ffs_feature_selections.npy", ffs_feature_selections)
 """
-
+#above commented as it takes a lot of time -> saved results in files
 
 data_ffs = np.load("ffs_data.npy")
 ffs_mses = np.load("ffs_mses.npy")

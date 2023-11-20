@@ -14,6 +14,9 @@ target = data[:, -1:]
 
 data = data[:, :-1]
 
+#standardize data
+data = (data - np.mean(data, axis=0))/np.std(data, axis=0)
+
 #train test split
 train_data = data[:1500, :]
 test_data = data[1500:, :]
@@ -55,14 +58,16 @@ data = pd.read_csv("wine+quality/winequality-white.csv", na_values=["?"], header
 
 data = data.to_numpy()
 
+np.random.shuffle(data)
+
 target = data[:, -1:]
 data = data[:, :-1]
 
 #train test split
-train_data = data[:int(data.shape[0]*0.8), :]
-test_data = data[int(data.shape[0]*0.8):, :]
-train_class = target[:int(data.shape[0]*0.8)]
-test_class = target[int(data.shape[0]*0.8):]
+train_data = data[:int(data.shape[0]*0.7), :]
+test_data = data[int(data.shape[0]*0.7):, :]
+train_class = target[:int(data.shape[0]*0.7)]
+test_class = target[int(data.shape[0]*0.7):]
 
 rows = train_data.shape[0]
 features = train_data.shape[1]
@@ -73,16 +78,17 @@ weights = np.random.rand(features, 1)
 #initialize regularization parameter
 alpha = 1
 #initialize learning rate
-eta = 0.0000011
-#initialize number of iterations
-n = 150
+eta = 0.000011 #0.0000011
 
 #initialize error list
 errors1 = []
 gradients = []
 
+#inital error dummy value
+error = 10
+
 #gradient descent
-for i in range(n):
+while error > 1:
     #calculate predictions
     pred = np.dot(train_data, weights)
     #print(np.argmax(train_data))
@@ -95,19 +101,17 @@ for i in range(n):
     error = sum((train_class - pred)**2)/train_data.shape[0]
     errors1.append(error)
 
-    #stop if error is small enough
-    if error < 0.0001:
-        break
-
 
 #plot error
 plt.plot(errors1)
+plt.title("MSE")
 plt.yscale("log")
 plt.show()
 
 #plot gradient
 plt.plot(gradients)
-#plt.yscale("log")
+plt.title("gradient")
+plt.yscale("log")
 plt.show()
 
 #predict
@@ -127,18 +131,17 @@ weights = np.random.rand(features, 1)
 #initialize regularization parameter
 alpha = 1
 #initialize learning rate
-eta = 0.0000011
-#initialize number of iterations
-n = 10
+eta = 0.00001
 
 #initialize error list
 errors2 = []
 gradients = []
 
+n = 3000
 #stohastic gradient descent for ridge regression
 for i in range(n):
-    print(i)
-    for j in range(rows):
+    #print(i)
+    """for j in range(rows): #Do it on random rows
         #calculate gradient
         gradient = np.dot(train_data[j, :].reshape(1, -1).T, (np.dot(train_data[j, :].reshape(1, -1), weights) - train_class[j])) + alpha*weights
         #update weights
@@ -146,7 +149,20 @@ for i in range(n):
         #calculate error
         pred = np.dot(test_data, weights)
         errors2.append(sum((test_class - pred)**2)/len(pred))
-        gradients.append(sum(gradient**2)/len(gradient))
+        gradients.append(sum(gradient**2)/len(gradient))"""
+    #with the for loop above the mse is much lower
+
+    #Choose random row
+    j = np.random.randint(0, rows)
+    # calculate gradient
+    gradient = np.dot(train_data[j, :].reshape(1, -1).T,
+                      (np.dot(train_data[j, :].reshape(1, -1), weights) - train_class[j])) + alpha * weights
+    # update weights
+    weights = weights - eta * gradient
+    # calculate error
+    pred = np.dot(test_data, weights)
+    errors2.append(sum((test_class - pred) ** 2) / len(pred))
+    gradients.append(sum(gradient ** 2) / len(gradient))
 
 
 
@@ -155,12 +171,14 @@ for i in range(n):
 
 #plot error
 plt.plot(errors2)
+plt.title("MSE")
 plt.yscale("log")
 plt.show()
 
 #plot gradient
 plt.plot(gradients)
-#plt.yscale("log")
+plt.title("gradient")
+plt.yscale("log")
 plt.show()
 
 #predict
