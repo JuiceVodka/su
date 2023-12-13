@@ -63,10 +63,10 @@ residualError = testClass - predictions
 residualsSklearn = testClass - predSklearn
 
 plt.subplot(2, 1, 1)
-plt.plot(np.arange(len(residualError)), residualError, 'o')
+plt.plot(testClass, residualError, 'o')
 plt.title("My implementation")
 plt.subplot(2, 1, 2)
-plt.plot(np.arange(len(residualsSklearn)), residualsSklearn, 'o')
+plt.plot(testClass, residualsSklearn, 'o')
 plt.title("Sklearn implementation")
 plt.show()
 
@@ -105,10 +105,10 @@ residualError = testClass - predictions
 residualsSklearn = testClass - predSklearn
 
 plt.subplot(2, 1, 1)
-plt.plot(np.arange(len(residualError)), residualError, 'o')
+plt.plot(testClass, residualError, 'o')
 plt.title("My implementation")
 plt.subplot(2, 1, 2)
-plt.plot(np.arange(len(residualsSklearn)), residualsSklearn, 'o')
+plt.plot(testClass, residualsSklearn, 'o')
 plt.title("Sklearn implementation")
 plt.show()
 

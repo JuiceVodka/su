@@ -58,6 +58,9 @@ data = pd.read_csv("wine+quality/winequality-white.csv", na_values=["?"], header
 
 data = data.to_numpy()
 
+#standardize data
+data = (data - np.mean(data, axis=0))/np.std(data, axis=0)
+
 np.random.shuffle(data)
 
 target = data[:, -1:]
@@ -78,7 +81,7 @@ weights = np.random.rand(features, 1)
 #initialize regularization parameter
 alpha = 1
 #initialize learning rate
-eta = 0.000011 #0.0000011
+eta = 0.00011 #0.0000011
 
 #initialize error list
 errors1 = []
@@ -88,7 +91,8 @@ gradients = []
 error = 10
 
 #gradient descent
-while error > 1:
+#while error > 1:
+for i in range(10000):
     #calculate predictions
     pred = np.dot(train_data, weights)
     #print(np.argmax(train_data))
@@ -137,7 +141,7 @@ eta = 0.00001
 errors2 = []
 gradients = []
 
-n = 3000
+n = 30000
 #stohastic gradient descent for ridge regression
 for i in range(n):
     #print(i)
