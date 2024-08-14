@@ -66,7 +66,7 @@ class GradientBoostingClassifier:
         # Sum up predictions from all trees
         for tree in self.models:
             leaf_values = tree.apply(X)
-            gamma += self.learning_rate * np.take(tree.tree_.value[:, 0, 0], leaf_values)
+            gamma += self.learning_rate * np.take(tree.tree_.value[:, 0, 0], leaf_values) #takes values from specified indices of tree
 
         # Convert gamma values to probabilities using the sigmoid function
         probabilities = self.sigmoid(gamma)
@@ -79,13 +79,11 @@ class GradientBoostingClassifier:
         probabilities = self.predict_proba(X)
 
         # Convert probabilities to binary predictions based on the threshold
-        binary_predictions = (probabilities[:, 1] >= threshold).astype(int)
+        binary_predictions = (probabilities[:, 1] >= threshold).astype(int) #0/1
 
         return binary_predictions
 
-# Example usage:
-# Assuming you have your training data in X_train and labels in y_train
-# and test data in X_test
+# Example usage to see if it runes
 
 # Generate synthetic data for testing
 X, y = make_classification(n_samples=1000, n_features=20, random_state=42)
@@ -171,49 +169,7 @@ for n_estimator in n_estimators:
         best_n_estimators = n_estimator
 
 
-#grid search for best combination of parameters
-best_accuracy = 0
-best_learning_rate = 0
-best_n_estimators = 0
-for learning_rate in learning_rates:
-    for n_estimator in n_estimators:
-        gb_clf = GradientBoostingClassifier(n_estimator, learning_rate)
-        gb_clf.fit(train_data, train_class)
-        y_pred = gb_clf.predict(test_data)
-        accuracy = accuracy_score(test_class, y_pred)
-        print(f"Accuracy for number of trees {n_estimator}, learning rate {learning_rate}: {accuracy}")
-        if accuracy > best_accuracy:
-            best_accuracy = accuracy
-            best_learning_rate = learning_rate
-            best_n_estimators = n_estimator
-
-print(f"Best accuracy: {best_accuracy}, best learning rate: {best_learning_rate}, best n_estimators: {best_n_estimators}")
-print()
-
-#calculate results on the test set
-gb_clf = GradientBoostingClassifier(n_estimators=best_n_estimators, learning_rate=best_learning_rate)
-gb_clf.fit(train_data, train_class)
-y_pred = gb_clf.predict(test_data)
-accuracy = accuracy_score(test_class, y_pred)
-print(f"Accuracy of my gradient boost implementation with best parameters on the test set: {accuracy}")
-
-#compare results to GradientBoostingClassifier from sklearn frok scikit-learn
-
-#initate the sklearn gradient boosting classifier
-gb_clf_sklearn = SklearnGradientBoostingClassifier(n_estimators=best_n_estimators, learning_rate=best_learning_rate)
-
-#fit the model and make predictions
-gb_clf_sklearn.fit(train_data, train_class)
-y_pred = gb_clf_sklearn.predict(test_data)
-
-#evaluate accuracy
-accuracy = accuracy_score(test_class, y_pred)
-print(f"Accuracy for sklearn gradient boosting clasifier: {accuracy}")
-
-print()
-print("CV")
-#cross validation for gradient boositng classification
-
+#grid search for best combination of parameters -> use cross validation
 def cv_gb_cl(train_data, train_class, n_estimators, learning_rate, k=5, model=GradientBoostingClassifier):
     #split the data into k folds
     folds = np.array_split(train_data, k)
@@ -243,6 +199,45 @@ def cv_gb_cl(train_data, train_class, n_estimators, learning_rate, k=5, model=Gr
 
     #return the mean accuracy
     return np.mean(accuracies)
+
+
+best_accuracy = 0
+best_learning_rate = 0
+best_n_estimators = 0
+for learning_rate in learning_rates:
+    for n_estimator in n_estimators:
+        cv_score = cv_gb_cl(train_data, train_class, n_estimator, learning_rate)
+        if cv_score > best_accuracy:
+            best_accuracy = cv_score
+            best_learning_rate = learning_rate
+            best_n_estimators = n_estimator
+
+print(f"Best Cross validation score: {best_accuracy}, best learning rate: {best_learning_rate}, best n_estimators: {best_n_estimators}")
+
+#Some comments:
+#the best learning rate in most of the experiments seemed to be 0.2
+#the depth of trees is limited to 5 prevent overfitting, some previous results without limit depth showed overfitting
+#the depth 5 was chosen through experiments
+
+#calculate results on the test set
+gb_clf = GradientBoostingClassifier(n_estimators=best_n_estimators, learning_rate=best_learning_rate)
+gb_clf.fit(train_data, train_class)
+y_pred = gb_clf.predict(test_data)
+accuracy = accuracy_score(test_class, y_pred)
+print(f"Accuracy of my gradient boost implementation with best parameters on the test set: {accuracy}")
+
+#compare results to GradientBoostingClassifier from sklearn frok scikit-learn
+gb_clf_sklearn = SklearnGradientBoostingClassifier(n_estimators=best_n_estimators, learning_rate=best_learning_rate)
+gb_clf_sklearn.fit(train_data, train_class)
+y_pred = gb_clf_sklearn.predict(test_data)
+
+#evaluate accuracy
+accuracy = accuracy_score(test_class, y_pred)
+print(f"Accuracy for sklearn gradient boosting clasifier: {accuracy}")
+
+print()
+print("CV")
+#cross validation for gradient boositng classification
 
 print(f"CV score for my implementation of gradient boosting classifier: {cv_gb_cl(train_data, train_class, best_n_estimators, best_learning_rate)}")
 print(f"CV score for sklearn gradient boosting classifier: {cv_gb_cl(train_data, train_class, best_n_estimators, best_learning_rate, model=SklearnGradientBoostingClassifier)}")

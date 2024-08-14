@@ -4,7 +4,7 @@ from sklearn import svm
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-"""
+
 data = pd.read_csv("data.csv", na_values=["?"], delimiter=",", header=0)
 print(data)
 data.drop("Unnamed: 32", axis=1, inplace=True)
@@ -48,6 +48,7 @@ def scikit_svm(kernel, regularization, sigma, data_train, data_test, target_trai
     predictions_encoded = np.where(pred == "B", 0, 1)
     return sum(test_class_encoded == predictions_encoded)/len(test_class_encoded)
 
+#grid search for best regularization parameter (i), kernel, and sigma parameter (j)
 for i in [0.01, 0.1, 0.5, 1, 2, 5, 10]:
     print(f"Accuracy with linear kernel and regularization parameter {i}: {scikit_svm('linear', i, 'scale', train_data, test_data, train_class, test_class)}")
     print(f"Accuracy with poly kernel and regularization parameter {i}: {scikit_svm('poly', i, 'scale', train_data, test_data, train_class, test_class)}")
@@ -55,7 +56,9 @@ for i in [0.01, 0.1, 0.5, 1, 2, 5, 10]:
         print(f"Accuracy with rbf kernel and regularization parameter {i} and sigma parameter {j}: {scikit_svm('rbf', i, j, train_data, test_data, train_class, test_class)}")
     print(f"Accuracy with sigmoid kernel and regularization parameter {i}: {scikit_svm('sigmoid', i, 'scale', train_data, test_data, train_class, test_class)}")
     print()
-"""
+
+
+
 #implement kernel regression to model data2
 
 data = pd.read_csv("data2.csv", na_values=["?"], delimiter=",", header=0)
@@ -63,6 +66,7 @@ data = pd.read_csv("data2.csv", na_values=["?"], delimiter=",", header=0)
 data_np = data.to_numpy()
 
 #standardize data
+#you should standardise od train and test separately
 class_std = np.std(data_np[:, -1])
 for i in range(data_np.shape[1]):
     data_np[:, i] = (data_np[:, i] - np.mean(data_np[:, i])) / np.std(data_np[:, i])
@@ -174,6 +178,7 @@ print(f"Best degree: {best_degree}, best MSE: {best_mse}")
 
 #plot predictions and the polynomial regression line
 predictions = kernel_regression(polynomial_kernel, best_degree, 1, train_data, test_data, train_class, test_class)
+plt.title("Polynomial kernel with best degree predictions")
 plt.scatter(test_data, test_class, label="test data")
 plt.scatter(test_data, predictions, label="predictions")
 plt.legend()
@@ -181,13 +186,24 @@ plt.show()
 
 #plot residuals vs predictions
 plt.scatter(test_class, predictions - test_class)
+plt.title("Polynomial kernel with best degree residuals")
 plt.xlabel("Class")
 plt.ylabel("Residuals")
 plt.show()
 
+
+
+
 #test plot for linear regression
 predictions = kernel_regression(polynomial_kernel, 1, 1, train_data, test_data, train_class, test_class)
+plt.title("Linear kernel predictions")
+plt.scatter(test_data, test_class, label="test data")
+plt.scatter(test_data, predictions, label="predictions")
+plt.legend()
+plt.show()
+
 plt.scatter(test_class, predictions - test_class)
+plt.title("Linear kernel residuals")
 plt.xlabel("Class")
 plt.ylabel("Residuals")
 plt.show()
@@ -195,6 +211,7 @@ plt.show()
 
 #plot predictions with exponential kernel
 predictions = kernel_regression(exponential_kernel, 5, 1, train_data, test_data, train_class, test_class)
+plt.title("Exponential kernel predictions")
 plt.scatter(test_data, test_class, label="test data")
 plt.scatter(test_data, predictions, label="predictions")
 plt.legend()
@@ -202,7 +219,23 @@ plt.show()
 
 #plot residuals for exponential kernel
 plt.scatter(test_class, predictions - test_class)
+plt.title("Exponential kernel residuals")
 plt.xlabel("Class")
 plt.ylabel("Residuals")
 plt.show()
 #exponential kernel is not the best choice for this data set
+
+#plot predictions with gaussian kernel
+predictions = kernel_regression(gaussian_kernel, 1, 1, train_data, test_data, train_class, test_class)
+plt.title("Gaussian kernel predictions")
+plt.scatter(test_data, test_class, label="test data")
+plt.scatter(test_data, predictions, label="predictions")
+plt.legend()
+plt.show()
+
+#plot residuals for gaussian kernel
+plt.scatter(test_class, predictions - test_class)
+plt.title("Gaussian kernel residuals")
+plt.xlabel("Class")
+plt.ylabel("Residuals")
+plt.show()

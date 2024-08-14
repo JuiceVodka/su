@@ -9,7 +9,6 @@ data = pd.read_csv("data/House_price.csv", na_values=["?"], header=0, delimiter=
 data = data.dropna()
 
 #change "yes" and "no" to 1 and 0
-#this data is in the second to last column, with header "bus_ter"
 data['bus_ter'] = (data['bus_ter'] =='YES').astype(int)
 data['airport'] = (data['airport'] =='YES').astype(int)
 #print(data['bus_ter'])
@@ -63,7 +62,7 @@ class RegressionTree:
                 right_mask = ~left_mask
 
                 if len(y[left_mask]) == 0 or len(y[right_mask]) == 0:
-                    continue  # Skip split if it results in an empty subset
+                    continue
 
                 left_mse = self.mse(y[left_mask])
                 right_mse = self.mse(y[right_mask])
@@ -100,7 +99,7 @@ class RegressionTree:
     def fit(self, X, y):
         self.tree = self.grow_tree(X, y)
 
-    def predict_single(self, x, tree):
+    def predict_single(self, x, tree): #predicts one sample
         if isinstance(tree, np.float64):
             return tree  # Leaf node, return the predicted value
         else:
@@ -112,11 +111,12 @@ class RegressionTree:
 
     def predict(self, X):
         if self.tree is None:
-            raise ValueError("Tree not fitted. Call fit() before predict().")
+            print("Model not trained yet. Call fit() before predict().")
+            return None
 
         return np.array([self.predict_single(x, self.tree) for x in X])
 
-# Example usage:
+# Unit case test to see if it runs
 # Assuming X_train and y_train are your training data
 X_train = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
 y_train = np.array([2, 4, 6, 8])
